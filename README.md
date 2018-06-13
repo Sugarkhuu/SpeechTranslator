@@ -7,7 +7,7 @@ Batch mode allows you to transcribe multiple audio files at once.
 ##Getting Started
 - You will need to setup a subscription with Microsoft Translator. [Click Here](https://www.microsoft.com/en-us/translator/default.aspx) to get started.
 
-- Speech API documentation can be [found here](https://docs.microsofttranslator.com/).
+- Speech API documentation can be [found here](https://aka.ms/TranslatorSpeechDocs).
 
 - This code makes calls to the Microsoft Translator Speech Translation APIs which are subject to the [Microsoft Privacy Statement](https://go.microsoft.com/fwlink/?LinkId=521839).
 
