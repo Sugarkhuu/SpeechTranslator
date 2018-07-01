@@ -4,7 +4,7 @@ Translate as you speak, and show a subtitle window on this or on another screen.
 Demo application to show the use of close to real-time translation and transcription.
 Batch mode allows you to transcribe multiple audio files at once.
 
-##Getting Started
+## Getting Started
 - You will need to setup a subscription with Microsoft Translator. [Click Here](https://www.microsoft.com/en-us/translator/default.aspx) to get started.
 
 - Speech API documentation can be [found here](https://aka.ms/TranslatorSpeechDocs).
