@@ -667,7 +667,7 @@ namespace SpeechTranslator
             options.Experimental = MenuItem_Experimental.IsChecked;
 
             // Setup player and recorder but don't start them yet.
-            WaveFormat waveFormat = new WaveFormat(16000, 16, 1);
+            WaveFormat waveFormat = new WaveFormat(24000, 16, 1);
 
             // WaveProvider for incoming TTS
             // We use a rather large BufferDuration because we need to be able to hold an entire utterance.
