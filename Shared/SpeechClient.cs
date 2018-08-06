@@ -48,17 +48,17 @@ namespace Microsoft.MT.Api.TestUtils
             /// <summary>
             /// Gets the text to speech (TTS) audio of the translation
             /// </summary>
-            TextToSpeech = 1,
+            TextToSpeech = 2,
 
             /// <summary>
             /// Gets partial speech recognitions (hypotheses)
             /// </summary>
-            Partial = 2,
+            Partial = 4,
 
             /// <summary>
             /// Returns timing offsets from the beginning of the stream for recognitions.
             /// </summary>
-            TimingInfo = 4,
+            TimingInfo = 8,
         }
 
         /// <summary>
