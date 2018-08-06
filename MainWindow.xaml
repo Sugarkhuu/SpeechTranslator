@@ -72,7 +72,7 @@
             <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">
                 <ComboBox x:Name="Voice" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="200"/>
                 <CheckBox x:Name="FeatureTTS" Content="TTS" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                <CheckBox x:Name="CutInputAudioCheckBox" Content="Cut input audio during TTS" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                <CheckBox x:Name="CutInputAudioCheckBox" Content="Disable microphone during TTS" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0"/>
                 <CheckBox x:Name="FeaturePartials" Content="Partial Results" Margin="20,0,0,0" VerticalAlignment="Center"/>
                 <Button x:Name="UpdateSettings" Content="Update" Background="#FFACACAC" Margin="20,0" Height="20" Width="60" VerticalAlignment="Stretch"/>
             </StackPanel>
@@ -85,7 +85,7 @@
                     <Button x:Name="StartListening" Content="Start" Background="#FFACACAC" Margin="0,2,0,0" Width="200" Click="StartListening_Click" IsDefault="True" HorizontalAlignment="Stretch" Height="21" VerticalAlignment="Top"/>
                 </StackPanel>
             </Grid>
-            <Label x:Name="CutInputAudioLabel" Grid.Row="6" Grid.Column="0" Content="CUTTING INPUT AUDIO" Foreground="Blue" VerticalAlignment="Center" Visibility="Collapsed" />
+            <Label x:Name="CutInputAudioLabel" Grid.Row="6" Grid.Column="0" Content="MICROPHONE DISABLED" Foreground="Blue" VerticalAlignment="Center" Visibility="Collapsed" />
             <CheckBox x:Name="BatchMode" Content="Batch Mode" Grid.Column="1" HorizontalAlignment="Left" Margin="326,10,0,0" Grid.Row="1" VerticalAlignment="Top" ToolTip="Mute speaker and translate faster than real time" Checked="BatchMode_Checked" Unchecked="BatchMode_Unchecked"/>
             <ProgressBar x:Name="BatchProgress" Grid.Column="1" HorizontalAlignment="Left" Height="15" Margin="426,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="345" ValueChanged="ProgressBar_ValueChanged"/>
         </Grid>

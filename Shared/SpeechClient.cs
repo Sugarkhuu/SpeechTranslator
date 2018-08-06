@@ -58,7 +58,7 @@ namespace Microsoft.MT.Api.TestUtils
             /// <summary>
             /// Returns timing offsets from the beginning of the stream for recognitions.
             /// </summary>
-            TimingInfo = 3,
+            TimingInfo = 4,
         }
 
         /// <summary>

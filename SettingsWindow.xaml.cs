@@ -23,11 +23,14 @@ namespace SpeechTranslator
         {
             InitializeComponent();
             ClientID.Text = Properties.Settings.Default.ClientID;
+            if (Properties.Settings.Default.UseAzureGovernment) RbAzureGov.IsChecked = true;
+            else RbAzurePublic.IsChecked = true;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.ClientID = ClientID.Text;
+            Properties.Settings.Default.UseAzureGovernment = (bool)RbAzureGov.IsChecked;
             Properties.Settings.Default.Save();
             this.Close();
         }
