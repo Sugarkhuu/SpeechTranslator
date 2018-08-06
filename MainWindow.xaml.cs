@@ -103,7 +103,9 @@ namespace SpeechTranslator
         // When auto-saving, save the slice Logs.Items[autoSaveFrom:]
         private int autoSaveFrom = 0;
 
-        private string baseUrl = "dev.microsofttranslator.com";
+        private const string baseUrlPublic = "dev.microsofttranslator.com";
+        private const string baseUrlGov = "dev.microsofttranslator.us";
+        private string baseUrl = baseUrlPublic;
 
         private class TTsDetail
         {
@@ -139,6 +141,7 @@ namespace SpeechTranslator
         public MainWindow()
         {
             InitializeComponent();
+            if (Properties.Settings.Default.UseAzureGovernment) baseUrl = baseUrlGov;
             Debug.Print("This is a debug message");
 
             Closing += MainWindow_Closing;
@@ -664,7 +667,7 @@ namespace SpeechTranslator
             options.Experimental = MenuItem_Experimental.IsChecked;
 
             // Setup player and recorder but don't start them yet.
-            WaveFormat waveFormat = new WaveFormat(16000, 16, 1);
+            WaveFormat waveFormat = new WaveFormat(24000, 16, 1);
 
             // WaveProvider for incoming TTS
             // We use a rather large BufferDuration because we need to be able to hold an entire utterance.
