@@ -103,6 +103,11 @@ namespace SpeechTranslator
         // When auto-saving, save the slice Logs.Items[autoSaveFrom:]
         private int autoSaveFrom = 0;
 
+
+        private static readonly Uri AuthServiceUrlPublic = new Uri("https://api.cognitive.microsoft.com/sts/v1.0/issueToken");
+        private static readonly Uri AuthServiceUrlGov = new Uri("https://virginia.api.cognitive.microsoft.us/sts/v1.0/issueToken");
+
+
         private const string baseUrlPublic = "dev.microsofttranslator.com";
         private const string baseUrlGov = "dev.microsofttranslator.us";
         private string baseUrl = baseUrlPublic;
@@ -225,9 +230,8 @@ namespace SpeechTranslator
         /// </summary>
         private void UpdateLanguageSettings()
         {
-            Task<bool> checkcredentialsTask = IsValidCredentialsAsync();
             UpdateUiState(UiState.GettingLanguageList);
-            UpdateLanguageSettingsAsync().ContinueWith(async (t) =>
+            UpdateLanguageSettingsAsync().ContinueWith((t) =>
                 {
                     var state = UiState.ReadyToConnect;
                     if (t.IsFaulted || t.IsCanceled)
@@ -235,11 +239,14 @@ namespace SpeechTranslator
                         state = UiState.MissingLanguageList;
                         this.Log(t.Exception, "E: Failed to get language list: {0}", t.IsCanceled ? "Timeout" : "");
                     }
-                    if (await checkcredentialsTask)
-                    {
+                    IsValidCredentialsAsync().ContinueWith(it => {
+                        if (it.IsFaulted || it.IsCanceled)
+                        {
+                            state = UiState.InvalidCredentials;
+                            this.Log(t.Exception, "E: Failed to get credentials: {0}", it.IsCanceled ? "Timeout" : "");
+                        }
                         SafeInvoke(() => UpdateUiState(state));
-                    }
-                    else SafeInvoke(() => UpdateUiState(UiState.InvalidCredentials));
+                    });
                 });
         }
 
@@ -553,10 +560,11 @@ namespace SpeechTranslator
                 SafeInvoke(() =>
                 {
                     // We only care to react to server disconnect when our state is Connected. 
-                    if (currentState == UiState.Connected)
+                    var sc = s2smtClient;
+                    if (currentState == UiState.Connected && sc != null)
                     {
                         Log("E: Connection has been lost.");
-                        Log($"E: Errors (if any): \n{string.Join("\n", s2smtClient.Errors)}");
+                        Log($"E: Errors (if any): \n{string.Join("\n", sc.Errors)}");
                         Disconnect();
                     }
                 });
@@ -568,7 +576,8 @@ namespace SpeechTranslator
         {
             // Authenticate
             string admClientId = Properties.Settings.Default.ClientID;
-            Microsoft.Translator.API.AzureAuthToken tokenSource = new Microsoft.Translator.API.AzureAuthToken(admClientId);
+            var url = Properties.Settings.Default.UseAzureGovernment ? AuthServiceUrlGov : AuthServiceUrlPublic;
+            Microsoft.Translator.API.AzureAuthToken tokenSource = new Microsoft.Translator.API.AzureAuthToken(admClientId, url);
             options.AuthHeaderValue = await tokenSource.GetAccessTokenAsync();
             if (options.AuthHeaderValue.Length < 10)
             {
@@ -580,7 +589,8 @@ namespace SpeechTranslator
         {
             // Authenticate
             string admClientId = Properties.Settings.Default.ClientID;
-            Microsoft.Translator.API.AzureAuthToken tokenSource = new Microsoft.Translator.API.AzureAuthToken(admClientId);
+            var url = Properties.Settings.Default.UseAzureGovernment ? AuthServiceUrlGov : AuthServiceUrlPublic;
+            Microsoft.Translator.API.AzureAuthToken tokenSource = new Microsoft.Translator.API.AzureAuthToken(admClientId, url);
             string token = await tokenSource.GetAccessTokenAsync();
             if (token.Length > 10) return true;
             else
@@ -667,7 +677,7 @@ namespace SpeechTranslator
             options.Experimental = MenuItem_Experimental.IsChecked;
 
             // Setup player and recorder but don't start them yet.
-            WaveFormat waveFormat = new WaveFormat(24000, 16, 1);
+            WaveFormat waveFormat = new WaveFormat(16000, 16, 1);
 
             // WaveProvider for incoming TTS
             // We use a rather large BufferDuration because we need to be able to hold an entire utterance.
@@ -800,16 +810,22 @@ namespace SpeechTranslator
                             bool error = false;
                             while(!done)
                             {
-                               if (currTask.Status == TaskStatus.Canceled || currTask.Status == TaskStatus.Faulted)
+                                var c = s2smtClient;
+                                if (c == null)
+                                {
+                                    done = true;
+                                    error = false;
+                                }
+                                else if (currTask.Status == TaskStatus.Canceled || currTask.Status == TaskStatus.Faulted)
                                 {
                                     Log($"E: Task was canceled or faulted.");
                                     done = true;
                                     error = true;
                                 }
-                                else if(!s2smtClient.IsConnected())
+                                else if(!c.IsConnected())
                                 {
                                     Log($"E: Client is not connected");
-                                    Log($"Errors from client (if any): \n{string.Join("\n", s2smtClient.Errors)}");
+                                    Log($"Errors from client (if any): \n{string.Join("\n", c.Errors)}");
                                     done = true;
                                     error = true;
                                 }
@@ -960,30 +976,34 @@ namespace SpeechTranslator
                 this.audioReceived = null;
             }
 
-            var task = s2smtClient.Disconnect()
-                .ContinueWith((t) =>
-                {
-                    if (t.IsFaulted)
+            var c = s2smtClient;
+            if (c != null)
+            {
+                s2smtClient = null;
+                var task = c.Disconnect()
+                    .ContinueWith((t) =>
                     {
-                        this.Log(t.Exception, "E: Disconnect call to client failed.");
-                    }
-                    s2smtClient.Dispose();
-                    s2smtClient = null;
-                })
-                .ContinueWith((t) => {
-                    if (t.IsFaulted)
-                    {
-                        this.Log(t.Exception, "E: Disconnected but there were errors.");
-                    }
-                    else
-                    {
-                        this.Log("I: Disconnected. cid='{0}'", correlationId);
-                    }
-                    this.SafeInvoke(() => {
-                        this.AutoSaveLogs();
-                        this.UpdateUiState(UiState.ReadyToConnect);
+                        if (t.IsFaulted)
+                        {
+                            this.Log(t.Exception, "E: Disconnect call to client failed.");
+                        }
+                        c.Dispose();
+                    })
+                    .ContinueWith((t) => {
+                        if (t.IsFaulted)
+                        {
+                            this.Log(t.Exception, "E: Disconnected but there were errors.");
+                        }
+                        else
+                        {
+                            this.Log("I: Disconnected. cid='{0}'", correlationId);
+                        }
+                        this.SafeInvoke(() => {
+                            this.AutoSaveLogs();
+                            this.UpdateUiState(UiState.ReadyToConnect);
+                        });
                     });
-                });
+            }
         }
 
         private void AddSamplesToPlay(ArraySegment<byte> a, bool suspendInputAudioDuringTTS)

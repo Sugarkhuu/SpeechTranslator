@@ -10,7 +10,7 @@
     <Grid>
         <StackPanel HorizontalAlignment="Left" Height="140" Margin="20,20,0,0" VerticalAlignment="Top" >
             <TextBlock Text="Speech Translator" HorizontalAlignment="Left" VerticalAlignment="Top" FontWeight="Bold"/>
-            <TextBlock Text="Version 0.9.2" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <TextBlock Text="Version 0.9.5" HorizontalAlignment="Left" VerticalAlignment="Top" />
             <TextBlock Text="A sample application for the Translator Speech API on Microsoft Azure." Margin="0,20,0,0" TextWrapping="Wrap"/>
             <TextBlock Text="https://github.com/microsofttranslator/speechtranslator" TextWrapping="Wrap"/>
         </StackPanel>

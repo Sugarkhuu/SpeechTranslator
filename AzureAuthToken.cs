@@ -10,8 +10,6 @@ namespace Microsoft.Translator.API
     /// </summary>
     public class AzureAuthToken
     {
-        /// URL of the token service
-        private static readonly Uri ServiceUrl = new Uri("https://api.cognitive.microsoft.com/sts/v1.0/issueToken");
         /// Name of header used to pass the subscription key to the token service
         private const string OcpApimSubscriptionKeyHeader = "Ocp-Apim-Subscription-Key";
         /// After obtaining a valid token, this class will cache it for this duration.
@@ -23,6 +21,9 @@ namespace Microsoft.Translator.API
         /// When the last valid token was obtained.
         private DateTime storedTokenTime = DateTime.MinValue;
 
+        /// Gets the URL of the auth service.
+        public Uri ServiceUrl { get; private set; }
+
         /// Gets the subscription key.
         public string SubscriptionKey { get; private set; }
 
@@ -33,13 +34,14 @@ namespace Microsoft.Translator.API
         /// Creates a client to obtain an access token.
         /// </summary>
         /// <param name="key">Subscription key to use to get an authentication token.</param>
-        public AzureAuthToken(string key)
+        public AzureAuthToken(string key, Uri authServiceUrl)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException("key", "A subscription key is required");
             }
 
+            this.ServiceUrl = authServiceUrl;
             this.SubscriptionKey = key;
             this.RequestStatusCode = HttpStatusCode.InternalServerError;
         }
