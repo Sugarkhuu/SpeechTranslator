@@ -1,5 +1,7 @@
 # Speech Translator
 
+**Note: The new Speech Service and SDK is replacing the Microsoft Translator Speech API, which will no longer work starting October 15, 2019. For information on switching to the Speech Service, see [Migrating from the Custom Speech Service to the Speech Service](https://review.docs.microsoft.com/en-us/azure/cognitive-services/speech-service/how-to-migrate-from-custom-speech-service).**
+
 Translate as you speak, and show a subtitle window on this or on another screen.
 Demo application to show the use of close to real-time translation and transcription.
 Batch mode allows you to transcribe multiple audio files at once.
